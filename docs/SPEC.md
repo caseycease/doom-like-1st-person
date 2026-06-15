@@ -421,7 +421,10 @@ struggles.
 - `CLAUDE.md` + exact run instructions.
 - *Stop for on-phone playtest.*
 
-**Phase 2+ — Expansion (outline only, not built yet):**
+**Phase 2 — Expansion (IMPLEMENTED):** clown variants, weapon progression with
+pickups, a 3-level campaign with carry-over + difficulty curve, projectiles +
+rocket splash, pause, and `localStorage` save/checkpoint. Audio events are wired
+through the `sfxId`-style contract (procedural blips for now). Original outline:
 - **Clown variants**, each a distinct AI state machine + sprite set:
   - *Melee jester* — fast, low HP, lunges (the Phase-1 clown generalized).
   - *Ranged balloon-bomber* — lobs slow arcing projectile entities; keeps distance.
@@ -448,4 +451,25 @@ struggles.
 
 ---
 
-*End of Phase 0 spec. Awaiting approval before any scaffolding or code.*
+## 11. Art Upgrade Path (real graphics later)
+
+Better graphics are a **drop-in**, by design — no engine/AI/combat/level changes:
+
+1. Author a texture atlas (clown frames per `state` × 8 `facing` directions, wall
+   textures, pickups, projectiles) + a JSON frame map.
+2. Implement `AtlasSpriteProvider` / `AtlasTextureProvider` against the existing
+   `SpriteProvider` / `TextureProvider` interfaces (`src/assets/spriteProvider.ts`),
+   loading the atlas at boot.
+3. Swap the provider at the composition root (`src/main.ts`) — keep the same
+   sprite/texture **ids** (`clown.brute`, `pickup.rocket`, wall ids 1–4, …).
+
+The renderer already consumes `SpriteFrame` bitmaps and supports the `facing`
+parameter, so directional sprites and animations light up automatically. The
+procedural provider stays as the offline/test fallback (tests render headlessly
+against it). Candidate upgrades beyond swapping art: per-wall texture filtering,
+textured floor/ceiling casting, and a WebGL renderer backend behind the same
+`Renderer` seam if fill-rate ever demands it.
+
+---
+
+*Phase 0 spec approved. Phases 1 and 2 implemented; see §9 for status.*

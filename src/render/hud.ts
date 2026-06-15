@@ -2,6 +2,7 @@
 // context — cheap, no per-pixel work. PLATFORM layer.
 
 import type { World } from '../engine/world';
+import { currentWeaponDef } from '../engine/entities';
 
 export function drawHud(
   ctx: CanvasRenderingContext2D,
@@ -9,12 +10,14 @@ export function drawHud(
   w: number,
   h: number,
   fps: number,
+  levelName: string,
 ): void {
   const p = world.player;
-  const weapon = p.weapons[p.currentWeapon];
+  const def = currentWeaponDef(p);
+  const ammo = p.ammo[def.ammoType];
 
-  // --- weapon viewmodel (simple pistol) bottom-center ---
-  const justFired = weapon.cooldownTimer > weapon.fireRate * 0.6;
+  // --- weapon viewmodel ---
+  const justFired = p.cooldownTimer > def.fireRate * 0.55;
   const gx = w / 2;
   const gy = h;
   ctx.fillStyle = '#2b2b33';
@@ -38,48 +41,48 @@ export function drawHud(
   ctx.lineTo(w / 2, h / 2 + 8);
   ctx.stroke();
 
-  // --- HUD text ---
   const pad = 16;
   ctx.textBaseline = 'bottom';
   ctx.font = '700 28px system-ui, sans-serif';
 
-  // health (left)
   const hpColor = p.health > 50 ? '#7CFC7C' : p.health > 20 ? '#FFD54A' : '#FF5A5A';
   drawLabel(ctx, `❤ ${Math.ceil(p.health)}`, pad, h - pad, hpColor);
 
-  // ammo (right)
-  const ammoText = `${weapon.name.toUpperCase()}  ${weapon.ammo}`;
-  ctx.textAlign = 'right';
-  drawLabel(ctx, ammoText, w - pad, h - pad, '#FFE08A', 'right');
-  ctx.textAlign = 'left';
+  drawLabel(ctx, `${def.name.toUpperCase()}  ${ammo}`, w - pad, h - pad, '#FFE08A', 'right');
 
-  // fps (top-left, dev)
+  // weapon slots line
   ctx.font = '600 14px system-ui, monospace';
+  const slots = p.weapons.map((wid, i) => (i === p.currentWeapon ? `[${wid}]` : wid)).join('  ');
+  drawLabel(ctx, slots, w - pad, h - pad - 32, 'rgba(220,220,235,0.85)', 'right');
+
+  // dev meters (top-left)
   drawLabel(ctx, `${fps.toFixed(0)} fps`, pad, pad + 14, 'rgba(180,180,200,0.8)');
+  ctx.font = '700 16px system-ui, sans-serif';
+  drawLabel(ctx, levelName, pad, pad + 38, 'rgba(230,210,160,0.9)');
 
-  // level-complete banner
-  if (world.levelComplete) {
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(0, h / 2 - 50, w, 100);
-    ctx.fillStyle = '#80FF88';
-    ctx.font = '800 40px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('LEVEL CLEARED', w / 2, h / 2 + 14);
-    ctx.textAlign = 'left';
-  }
-
-  // death banner
+  if (world.levelComplete) banner(ctx, w, h, '#80FF88', 'LEVEL CLEARED', 'tap to continue');
   if (p.health <= 0) {
     ctx.fillStyle = 'rgba(60,0,0,0.55)';
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = '#FF6A6A';
-    ctx.font = '800 48px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('YOU DIED', w / 2, h / 2);
-    ctx.font = '600 20px system-ui, sans-serif';
-    ctx.fillText('tap to restart', w / 2, h / 2 + 40);
-    ctx.textAlign = 'left';
+    centerText(ctx, w, h - 10, '#FF6A6A', '800 48px system-ui, sans-serif', 'YOU DIED');
+    centerText(ctx, w, h / 2 + 40, '#FF6A6A', '600 20px system-ui, sans-serif', 'tap to restart');
   }
+}
+
+function banner(ctx: CanvasRenderingContext2D, w: number, h: number, color: string, big: string, small: string): void {
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(0, h / 2 - 50, w, 100);
+  centerText(ctx, w, h / 2 + 6, color, '800 40px system-ui, sans-serif', big);
+  centerText(ctx, w, h / 2 + 36, color, '600 18px system-ui, sans-serif', small);
+}
+
+function centerText(ctx: CanvasRenderingContext2D, w: number, y: number, color: string, font: string, text: string): void {
+  ctx.save();
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.fillText(text, w / 2, y);
+  ctx.restore();
 }
 
 function drawLabel(

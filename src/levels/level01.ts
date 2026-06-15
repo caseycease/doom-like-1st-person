@@ -43,14 +43,15 @@ function buildTiles(): Uint8Array {
 }
 
 const entities: EntitySpawn[] = [
-  // clowns
-  { kind: 'clown', x: 6.5, y: 2.5 }, // visible at spawn -> immediate chase
-  { kind: 'clown', x: 12.5, y: 3.5 }, // around the divider
-  { kind: 'clown', x: 5.5, y: 12.5 }, // lower midway
-  { kind: 'clown', x: 20.5, y: 12.5 }, // guards the exit
+  // clowns — gentle intro: jesters + one acrobat
+  { kind: 'clown', x: 6.5, y: 2.5, archetype: 'jester' }, // visible at spawn -> immediate chase
+  { kind: 'clown', x: 12.5, y: 3.5, archetype: 'jester' },
+  { kind: 'clown', x: 5.5, y: 12.5, archetype: 'acrobat' },
+  { kind: 'clown', x: 20.5, y: 12.5, archetype: 'jester' }, // guards the exit
   // pickups
-  { kind: 'pickup', x: 10.5, y: 12.5, pickupType: 'ammo', amount: 14 },
+  { kind: 'pickup', x: 10.5, y: 12.5, pickupType: 'ammo', ammoType: 'bullets', amount: 20 },
   { kind: 'pickup', x: 13.5, y: 2.5, pickupType: 'health', amount: 25 },
+  { kind: 'pickup', x: 3.5, y: 12.5, pickupType: 'weapon', weaponId: 'shotgun', amount: 12 },
   // level exit
   { kind: 'exit', x: 19.5, y: 12.5 },
 ];

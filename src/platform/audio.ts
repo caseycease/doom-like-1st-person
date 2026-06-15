@@ -9,6 +9,7 @@ const EVENT_SFX: Partial<Record<GameEvent['type'], { freq: number; dur: number; 
   enemyHit: { freq: 320, dur: 0.05, type: 'triangle' },
   enemyDied: { freq: 110, dur: 0.25, type: 'sawtooth' },
   pickup: { freq: 660, dur: 0.12, type: 'sine' },
+  weaponPickup: { freq: 520, dur: 0.2, type: 'triangle' },
   playerHurt: { freq: 90, dur: 0.18, type: 'square' },
   levelComplete: { freq: 880, dur: 0.4, type: 'sine' },
 };

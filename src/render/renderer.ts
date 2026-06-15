@@ -114,8 +114,8 @@ export class Renderer {
       const unit = height / depth; // screen px for a 1-tile-tall object
       const screenH = unit * set.worldHeight;
       const screenW = (screenH * frame.w) / frame.h;
-      const floorY = hz + (unit >> 1);
-      const top = floorY - screenH;
+      // Standing entities rest on the floor; projectiles float at eye level.
+      const top = e.kind === 'projectile' ? hz - screenH / 2 : hz + (unit >> 1) - screenH;
       const left = screenX - screenW / 2;
       const shade = spriteShade(depth, light);
 

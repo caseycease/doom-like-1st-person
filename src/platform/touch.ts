@@ -9,8 +9,9 @@ const LOOK_YAW = 0.005; // rad per px
 const LOOK_PITCH = 0.004; // rad per px (screen-space)
 const FIRE_R = 70;
 const SWAP_R = 38;
+const PAUSE_R = 26;
 
-type Role = 'move' | 'look' | 'fire' | 'swap';
+type Role = 'move' | 'look' | 'fire' | 'swap' | 'pause';
 
 interface Pointer {
   role: Role;
@@ -30,6 +31,8 @@ export interface TouchUiState {
   fireCY: number;
   swapCX: number;
   swapCY: number;
+  pauseCX: number;
+  pauseCY: number;
 }
 
 export class TouchControls {
@@ -39,6 +42,7 @@ export class TouchControls {
   private lookDY = 0;
   private firing = false;
   private swapPulse = 0;
+  private pausePulse = false;
   private joyActive = false;
   private joyX = 0;
   private joyY = 0;
@@ -68,8 +72,14 @@ export class TouchControls {
     const r = this.rect();
     return { x: r.width / 2, y: r.height - 56 };
   }
+  private pauseCenter() {
+    const r = this.rect();
+    return { x: r.width - 44, y: 44 };
+  }
 
   private classify(x: number, y: number): Role {
+    const pz = this.pauseCenter();
+    if (Math.hypot(x - pz.x, y - pz.y) <= PAUSE_R) return 'pause';
     const f = this.fireCenter();
     if (Math.hypot(x - f.x, y - f.y) <= FIRE_R) return 'fire';
     const s = this.swapCenter();
@@ -93,6 +103,8 @@ export class TouchControls {
       this.firing = true;
     } else if (role === 'swap') {
       this.swapPulse = 1;
+    } else if (role === 'pause') {
+      this.pausePulse = true;
     }
   };
 
@@ -147,9 +159,17 @@ export class TouchControls {
     return s;
   }
 
+  /** Returns true once per pause-button press. */
+  consumePause(): boolean {
+    const p = this.pausePulse;
+    this.pausePulse = false;
+    return p;
+  }
+
   ui(): TouchUiState {
     const f = this.fireCenter();
     const sw = this.swapCenter();
+    const pz = this.pauseCenter();
     return {
       joyActive: this.joyActive,
       joyX: this.joyX,
@@ -160,6 +180,8 @@ export class TouchControls {
       fireCY: f.y,
       swapCX: sw.x,
       swapCY: sw.y,
+      pauseCX: pz.x,
+      pauseCY: pz.y,
     };
   }
 }

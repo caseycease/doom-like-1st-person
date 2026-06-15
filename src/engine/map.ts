@@ -1,7 +1,7 @@
 // Grid-based map format. Plain data, hand-authored in src/levels/*.
 
 export type SpawnKind = 'clown' | 'pickup' | 'exit';
-export type PickupType = 'ammo' | 'health';
+export type PickupType = 'ammo' | 'health' | 'weapon';
 
 export interface EntitySpawn {
   kind: SpawnKind;
@@ -10,9 +10,13 @@ export interface EntitySpawn {
   angle?: number;
   /** Sprite id resolved by the SpriteProvider — NOT a file path. */
   spriteId?: string;
+  /** For clowns: which variant. */
+  archetype?: import('./entities').ClownArchetype;
   /** For pickups. */
   pickupType?: PickupType;
   amount?: number;
+  weaponId?: import('./entities').WeaponId;
+  ammoType?: import('./entities').AmmoType;
 }
 
 export interface PlayerSpawn {

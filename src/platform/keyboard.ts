@@ -13,6 +13,7 @@ export class KeyboardControls {
   private mouseDX = 0;
   private mouseDY = 0;
   private swapPulse = 0;
+  private pausePulse = false;
 
   constructor(private el: HTMLElement) {
     window.addEventListener('keydown', this.onKey);
@@ -27,6 +28,7 @@ export class KeyboardControls {
     const k = e.key.toLowerCase();
     if (k === 'q') this.swapPulse = -1;
     if (k === 'e') this.swapPulse = 1;
+    if (k === 'p' || k === 'escape') this.pausePulse = true;
     this.keys.add(k);
   };
   private onKeyUp = (e: KeyboardEvent): void => {
@@ -68,5 +70,11 @@ export class KeyboardControls {
     this.mouseDY = 0;
     this.swapPulse = 0;
     return s;
+  }
+
+  consumePause(): boolean {
+    const p = this.pausePulse;
+    this.pausePulse = false;
+    return p;
   }
 }

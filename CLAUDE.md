@@ -71,9 +71,26 @@ npm run preview    # serve the production build (use --host for phone testing)
 
 ## Status / next
 
-- **Done (Phase 1):** one level, raycasting render + adaptive resolution, touch
-  controls, basic clown (spawn/billboard/chase/damage/death), pistol hitscan +
-  ammo, HUD (health/ammo), 34 passing tests.
-- **Next (Phase 2+, outline in SPEC §9):** clown variants, weapon progression,
-  3–5 maps, audio samples, save/checkpoint, pause. Do not start until the slice
-  is approved.
+- **Done (Phase 1):** raycasting render + adaptive resolution, touch controls,
+  basic clown, pistol hitscan, HUD.
+- **Done (Phase 2):** clown variants (jester/brute/acrobat/bomber, the last
+  ranged via projectiles), weapon progression (pistol → shotgun → nailgun →
+  rocket) with ammo pools and weapon pickups, 3-level campaign with carry-over +
+  difficulty curve, projectile system with rocket splash, pause, and
+  save/checkpoint to `localStorage`. **59 passing tests** including a campaign
+  validator (no entity/player spawned inside a wall).
+- **Key systems & where they live:**
+  - Weapons/ammo/enemy stats are data tables in `engine/entities.ts`
+    (`WEAPONS`, `ENEMIES`, `AMMO_MAX`). Tune balance there.
+  - Firing, hitscan spread, projectiles + splash: `engine/combat.ts`.
+  - Per-archetype AI (melee/ranged/strafe): `engine/ai.ts`.
+  - Campaign order: `levels/index.ts`. Levels validate via `test/levels.test.ts`.
+  - Save format: `engine/save.ts` (pure); platform glue in `main.ts`.
+- **Art-upgrade path (planned):** all visuals are procedural placeholders behind
+  `SpriteProvider`/`TextureProvider` (`assets/spriteProvider.ts`). To drop in real
+  art, add an `AtlasSpriteProvider` (load a texture atlas + JSON frame map) and
+  swap it in at the composition root — no engine/AI/combat/level changes. Sprite
+  ids (`clown.brute`, `projectile.rocket`, …) are the stable contract; the 8-way
+  `facing` + `state` params already exist in `SpriteSet.frame()`.
+- **Next (Phase 3 ideas):** real art via atlas provider, audio samples, locked
+  doors/keys, more maps, boss clown, settings menu (sensitivity/resolution).
