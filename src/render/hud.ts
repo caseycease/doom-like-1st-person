@@ -16,20 +16,9 @@ export function drawHud(
   const def = currentWeaponDef(p);
   const ammo = p.ammo[def.ammoType];
 
-  // --- weapon viewmodel ---
-  const justFired = p.cooldownTimer > def.fireRate * 0.55;
-  const gx = w / 2;
-  const gy = h;
-  ctx.fillStyle = '#2b2b33';
-  ctx.fillRect(gx - 18, gy - 70, 36, 70);
-  ctx.fillStyle = '#1a1a20';
-  ctx.fillRect(gx - 10, gy - 110, 20, 45);
-  if (justFired) {
-    ctx.fillStyle = 'rgba(255,220,120,0.9)';
-    ctx.beginPath();
-    ctx.arc(gx, gy - 116, 14, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // --- weapon viewmodel (per weapon, with recoil kick + muzzle flash) ---
+  const recoil = def.fireRate > 0 ? Math.max(0, p.cooldownTimer / def.fireRate) : 0;
+  drawViewmodel(ctx, def.id, w, h, recoil);
 
   // --- crosshair ---
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
@@ -67,6 +56,52 @@ export function drawHud(
     centerText(ctx, w, h - 10, '#FF6A6A', '800 48px system-ui, sans-serif', 'YOU DIED');
     centerText(ctx, w, h / 2 + 40, '#FF6A6A', '600 20px system-ui, sans-serif', 'tap to restart');
   }
+}
+
+function drawViewmodel(ctx: CanvasRenderingContext2D, id: string, w: number, h: number, recoil: number): void {
+  const gx = w / 2;
+  const gy = h + recoil * 14; // kick down on fire
+  const flash = recoil > 0.55;
+  ctx.save();
+  const metal = '#23242c';
+  const dark = '#14151b';
+  if (id === 'shotgun') {
+    ctx.fillStyle = metal;
+    ctx.fillRect(gx - 26, gy - 60, 52, 60);
+    ctx.fillStyle = dark;
+    ctx.fillRect(gx - 18, gy - 104, 14, 50);
+    ctx.fillRect(gx + 4, gy - 104, 14, 50);
+  } else if (id === 'smg') {
+    ctx.fillStyle = metal;
+    ctx.fillRect(gx - 16, gy - 64, 32, 64);
+    ctx.fillStyle = dark;
+    ctx.fillRect(gx - 6, gy - 124, 12, 64);
+  } else if (id === 'rocket') {
+    ctx.fillStyle = '#3a3030';
+    ctx.fillRect(gx - 30, gy - 70, 60, 70);
+    ctx.fillStyle = '#262024';
+    ctx.fillRect(gx - 14, gy - 116, 28, 52);
+    ctx.strokeStyle = '#5a4a3a';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(gx - 14, gy - 116, 28, 52);
+  } else {
+    // pistol
+    ctx.fillStyle = metal;
+    ctx.fillRect(gx - 18, gy - 70, 36, 70);
+    ctx.fillStyle = dark;
+    ctx.fillRect(gx - 10, gy - 110, 20, 45);
+  }
+  if (flash) {
+    const topY = id === 'rocket' ? gy - 116 : id === 'smg' ? gy - 124 : id === 'shotgun' ? gy - 104 : gy - 110;
+    const grd = ctx.createRadialGradient(gx, topY, 2, gx, topY, 22);
+    grd.addColorStop(0, 'rgba(255,245,200,0.95)');
+    grd.addColorStop(1, 'rgba(255,180,80,0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(gx, topY, 22, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 function banner(ctx: CanvasRenderingContext2D, w: number, h: number, color: string, big: string, small: string): void {

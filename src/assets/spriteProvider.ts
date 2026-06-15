@@ -32,6 +32,9 @@ export interface WallTexture {
 
 export interface TextureProvider {
   wall(id: number): WallTexture;
+  /** Floor/ceiling textures for floorcasting. */
+  floor(): WallTexture;
+  ceil(): WallTexture;
 }
 
 /** Pack RGBA into a little-endian Uint32 (matches ImageData byte order). */

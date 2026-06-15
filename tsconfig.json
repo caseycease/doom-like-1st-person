@@ -16,5 +16,7 @@
     "verbatimModuleSyntax": false,
     "types": []
   },
-  "include": ["src", "test", "vite.config.ts"]
+  "include": ["src", "test", "vite.config.ts"],
+  "comment": "screenshot.test.ts is a Node-only dev utility (uses Buffer/fs); run via vitest, skip from the browser-targeted tsc build.",
+  "exclude": ["test/screenshot.test.ts"]
 }
