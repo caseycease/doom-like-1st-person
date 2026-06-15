@@ -1,0 +1,21 @@
+{
+  "name": "carnival-of-fear",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Mobile-first Doom-style raycasting FPS set in an abandoned amusement park overrun by clowns.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vite-plugin-pwa": "^0.20.0",
+    "vitest": "^1.6.0"
+  }
+}
